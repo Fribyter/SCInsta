@@ -86,17 +86,27 @@ jobs:
                 THEOS: ${{ github.workspace }}/theos
 
             - name: Prepare Instagram IPA
-              run: |
-                cd main
-
-                mkdir -p packages
-                wget "$Instagram_URL" --no-verbose -O packages/com.burbn.instagram.ipa
-
-                ls -la packages
-                
+              shell: bash
               env:
-                THEOS: ${{ github.workspace }}/theos
                 Instagram_URL: ${{ inputs.decrypted_instagram_url }}
+              run: |
+                set -euo pipefail
+
+                python3 -m pip install --upgrade gdown
+
+                cd main
+                mkdir -p packages
+
+                gdown "$Instagram_URL" \
+                  -O packages/com.burbn.instagram.ipa
+
+                ls -lh packages/com.burbn.instagram.ipa
+                file packages/com.burbn.instagram.ipa
+
+                if ! unzip -tq packages/com.burbn.instagram.ipa; then
+                  echo "::error::下载的文件不是完整有效的 IPA/ZIP，请检查下载链接和访问权限。"
+                  exit 1
+                fi
 
             - name: Get SCInsta Version
               id: scinsta_version
