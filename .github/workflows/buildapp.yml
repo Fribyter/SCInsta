@@ -92,7 +92,11 @@ jobs:
               run: |
                 set -euo pipefail
 
-                python3 -m pip install --upgrade gdown
+                python3 -m venv "$RUNNER_TEMP/scinsta-venv"
+                source "$RUNNER_TEMP/scinsta-venv/bin/activate"
+                echo "$RUNNER_TEMP/scinsta-venv/bin" >> "$GITHUB_PATH"
+
+                python -m pip install --upgrade gdown
 
                 cd main
                 mkdir -p packages
